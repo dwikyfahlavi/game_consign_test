@@ -20,6 +20,8 @@ void main() async {
 
   await setupLocator();
   initializeLocator();
+  await NotificationService().requestExactAlarmPermission();
+  await NotificationService().requestNotificationPermission();
   await NotificationService().init();
   runApp(const MyApp());
 }

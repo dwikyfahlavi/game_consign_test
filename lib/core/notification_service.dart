@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
@@ -17,6 +20,29 @@ class NotificationService {
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.requestNotificationsPermission();
+  }
+
+  Future<void> requestExactAlarmPermission() async {
+    if (Platform.isAndroid && (await Permission.scheduleExactAlarm.isDenied)) {
+      // Request the exact alarm permission
+      final status = await Permission.scheduleExactAlarm.request();
+      if (status.isGranted) {
+        print('Exact alarm permission granted');
+      } else {
+        print('Exact alarm permission denied');
+      }
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    if (Platform.isAndroid) {
+      final status = await Permission.notification.request();
+      if (status.isGranted) {
+        print('Notification permission granted');
+      } else {
+        print('Notification permission denied');
+      }
+    }
   }
 
   Future<void> showNotification({
@@ -61,6 +87,8 @@ class NotificationService {
       tz.TZDateTime.from(scheduledDate, tz.local),
       NotificationDetails(android: android, iOS: ios),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: null,
     );
   }
